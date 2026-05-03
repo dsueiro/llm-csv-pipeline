@@ -26,6 +26,7 @@ DEFAULT_PROMPT_COLUMN = "prompt"
 
 RESULT_FIELD = "resultado"
 EMBEDDING_FIELD = "embedding"
+PROMPT_EMBEDDING_FIELD = "prompt_embedding"
 STATUS_FIELD = "status"
 ERROR_FIELD = "error_message"
 SOURCE_FIELD = "source_file"
@@ -178,7 +179,7 @@ def load_processed_ok_ids(output_path: Path) -> Set[str]:
 
 def build_output_fieldnames(input_fieldnames: List[str]) -> List[str]:
     fieldnames = list(input_fieldnames)
-    for extra in ("id", SOURCE_FIELD, RESULT_FIELD, EMBEDDING_FIELD, STATUS_FIELD, ERROR_FIELD):
+    for extra in ("id", SOURCE_FIELD, RESULT_FIELD, EMBEDDING_FIELD, PROMPT_EMBEDDING_FIELD, STATUS_FIELD, ERROR_FIELD):
         if extra not in fieldnames:
             fieldnames.append(extra)
     return fieldnames
@@ -265,6 +266,7 @@ def main() -> int:
                 row[SOURCE_FIELD] = input_path.name
                 row[RESULT_FIELD] = ""
                 row[EMBEDDING_FIELD] = ""
+                row[PROMPT_EMBEDDING_FIELD] = ""
                 row[STATUS_FIELD] = "bad_row"
                 row[ERROR_FIELD] = "empty prompt"
                 writer.writerow(row)
@@ -285,9 +287,19 @@ def main() -> int:
                 )
                 log(f"EMB OK id={row_id}")
 
+                prompt_embedding = embed_text(
+                    client=client,
+                    model_name=args.embedding_model,
+                    text=prompt,
+                    output_dimensionality=args.embedding_dim,
+                    row_id=row_id,
+                )
+                log(f"PEMB OK id={row_id}")
+
                 row[SOURCE_FIELD] = input_path.name
                 row[RESULT_FIELD] = result_text
                 row[EMBEDDING_FIELD] = json.dumps(embedding, ensure_ascii=False)
+                row[PROMPT_EMBEDDING_FIELD] = json.dumps(prompt_embedding, ensure_ascii=False)
                 row[STATUS_FIELD] = "ok"
                 row[ERROR_FIELD] = ""
 
@@ -312,6 +324,7 @@ def main() -> int:
                 row[SOURCE_FIELD] = input_path.name
                 row[RESULT_FIELD] = ""
                 row[EMBEDDING_FIELD] = ""
+                row[PROMPT_EMBEDDING_FIELD] = ""
                 row[STATUS_FIELD] = "transient_error" if kind == "transient" else "fatal_error"
                 row[ERROR_FIELD] = msg
                 writer.writerow(row)
