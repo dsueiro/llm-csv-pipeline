@@ -1,4 +1,4 @@
-# Gemini Batch Scripts
+# Gemini / OpenAI Batch Scripts
 
 Two scripts for processing CSV files with the Gemini or OpenAI APIs. Each script generates text and/or computes embeddings for every row in a CSV, with resume/checkpointing support so interrupted runs can be continued safely.
 
