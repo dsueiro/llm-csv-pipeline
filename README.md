@@ -143,6 +143,31 @@ python add_prompts.py input.csv --output output.csv --limit 100  # resumes
 
 ---
 
+## `extract_columns.py`
+
+Extracts a subset of columns from a CSV and writes them to a new file. Useful for trimming wide CSVs before feeding them to other scripts or tools.
+
+### Usage
+
+```bash
+python extract_columns.py input.csv --output output.csv --columns col1 col2 col3
+```
+
+Column names with spaces must be quoted:
+
+```bash
+python extract_columns.py input.csv --output output.csv --columns id "first name" score
+```
+
+### Options
+
+| Flag | Description |
+|---|---|
+| `--output` | *(required)* Output CSV path. |
+| `--columns` | *(required)* One or more column names to extract. |
+
+---
+
 ## Resume behavior
 
 Both scripts skip rows that have already been successfully processed. Re-running the same command is always safe.
